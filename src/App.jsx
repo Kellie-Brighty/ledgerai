@@ -465,6 +465,8 @@ https://cors-anywhere.herokuapp.com/corsdemo
     setOutput((prev) => [...prev, ""]);
     typeResponse("Thinking...");
 
+    console.log("API key:::", import.meta.env.VITE_OPENAI_API_KEY)
+
     try {
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
