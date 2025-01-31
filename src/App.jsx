@@ -65,6 +65,14 @@ const DogAITerminal = () => {
     setIsTyping(true);
     setCurrentTypingIndex(0);
 
+    // If response is a React element, add it directly to output
+    if (React.isValidElement(response)) {
+      setOutput((prev) => [...prev, response]);
+      setIsTyping(false);
+      setCurrentTypingIndex(-1);
+      return;
+    }
+
     const typeChar = (index) => {
       if (index < response.length) {
         setOutput((prev) => {
@@ -77,7 +85,7 @@ const DogAITerminal = () => {
 
           return [...prev.slice(0, -1), lastLine + response[index]];
         });
-        setTimeout(() => typeChar(index + 1), 25); // Slightly faster typing speed
+        setTimeout(() => typeChar(index + 1), 25);
       } else {
         setIsTyping(false);
         setCurrentTypingIndex(-1);
@@ -339,6 +347,55 @@ ${Object.entries(tokens)
     }
   };
 
+  const generateArt = async (prompt) => {
+    try {
+      setOutput((prev) => [...prev, "🎨 Generating art..."]);
+
+      const response = await fetch(
+        "https://api.openai.com/v1/images/generations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "dall-e-3",
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024",
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      const imageUrl = data.data[0].url;
+
+      // Return both text and image element
+      return (
+        <>
+          <div>🎨 Generated Art ━━━━━━━━━━━━━━ Prompt: "{prompt}"</div>
+          <div className="my-4">
+            <img
+              src={imageUrl}
+              alt={prompt}
+              className="max-w-full rounded-lg border-2 border-[#4B2664] shadow-lg"
+              style={{ maxHeight: "300px", objectFit: "contain" }}
+            />
+          </div>
+          <div>━━━━━━━━━━━━━━</div>
+        </>
+      );
+    } catch (error) {
+      console.error("Art generation error:", error);
+      return "❌ Sorry, I couldn't generate the art. Please try again.";
+    }
+  };
+
   const processCommand = async (cmd) => {
     setOutput((prev) => [...prev, `> ${cmd}`]);
     let response = "";
@@ -360,7 +417,7 @@ ${Object.entries(tokens)
 💬  telegram - Get Telegram link for Ledger AI
 🧹  clear (or cls) - Clear terminal
 💎  addressinfo <address-to-check> - Simple XRP address lookup
-
+🎨  art <description> - Generate AI art
 🪙  <address-to-scan> - Much detailed XRP address lookup
 
 💡 Any other input will be sent to AI for a response.
@@ -427,6 +484,27 @@ https://cors-anywhere.herokuapp.com/corsdemo
           setOutput((prev) => [...prev, ""]);
           typeResponse("🔍 Fetching token information...");
           response = await fetchTokenInfo(parameter);
+        }
+        break;
+
+      case "art":
+        if (!parameter) {
+          response = `
+❌ Missing Prompt
+━━━━━━━━━━━━━━
+
+Usage: art <description>
+Example: art a cyberpunk xrp logo in neon style
+━━━━━━━━━━━━━━━━━━━━━━━`;
+        } else {
+          setOutput((prev) => [...prev, ""]);
+          const artResponse = await generateArt(parameter);
+          // Directly set the output without going through typeResponse for JSX elements
+          if (React.isValidElement(artResponse)) {
+            setOutput((prev) => [...prev.slice(0, -1), artResponse]);
+          } else {
+            response = artResponse;
+          }
         }
         break;
 
@@ -573,12 +651,12 @@ https://cors-anywhere.herokuapp.com/corsdemo
               className="text-white mb-4 flex-1 overflow-y-auto scrollbar-custom scroll-smooth"
             >
               {output.map((line, index) => (
-                <p
+                <div
                   key={index}
                   className="mb-1 text-sm sm:text-base break-words"
                 >
-                  {line}
-                </p>
+                  {typeof line === "string" ? line : line}
+                </div>
               ))}
             </div>
             <div className="flex items-center text-white">
