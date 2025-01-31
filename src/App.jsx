@@ -525,7 +525,9 @@ https://cors-anywhere.herokuapp.com/corsdemo
                 [telegram]
               </a>
               <a
-                href="#"
+                href="https://dexscreener.com/xrpl/4C65646765724149000000000000000000000000.rBqRAvt5ir9dupawG3L3osUWYRJ8nQ9VH_xrp"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-white transition-colors duration-300 hover:text-[#E2C400]"
               >
                 [chart]
