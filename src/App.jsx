@@ -28,7 +28,7 @@ const DogAITerminal = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      setAddress("000000000000000000000");
+      setAddress("rBqRAvt5ir9dupawG3L3osUWYRJ8nQ9VH");
     }, 1000);
   }, []);
 
