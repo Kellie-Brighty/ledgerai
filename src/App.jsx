@@ -465,7 +465,7 @@ https://cors-anywhere.herokuapp.com/corsdemo
     setOutput((prev) => [...prev, ""]);
     typeResponse("Thinking...");
 
-    console.log("API key:::", import.meta.env.VITE_OPENAI_API_KEY)
+    console.log("API key:::", import.meta.env.VITE_OPENAI_API_KEY);
 
     try {
       const response = await fetch(
@@ -542,6 +542,16 @@ https://cors-anywhere.herokuapp.com/corsdemo
                 or XRP chain-related questions in one go. Try Ledger AI today
                 below.
               </p>
+              <div className="flex items-center gap-2 bg-[#1A0626] p-2 rounded-md border border-[#4B2664]">
+                <span className="text-white text-sm"></span>
+                <code className="text-[#E2C400] text-sm flex-1">{address}</code>
+                <button
+                  onClick={copyToClipboard}
+                  className="text-white hover:text-[#E2C400] transition-colors duration-300"
+                >
+                  {copied ? "✓" : "📋"}
+                </button>
+              </div>
             </div>
             <div className="flex-none flex justify-center sm:block">
               <img
